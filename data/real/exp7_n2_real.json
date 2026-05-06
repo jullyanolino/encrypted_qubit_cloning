@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "7",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "ibm_fez",
+    "backend_type": "real",
+    "timestamp": "2026-05-06T00:40:43.372356Z"
+  },
+  "result": {
+    "n": 2,
+    "n_drops": 4,
+    "Fe_activated": 0.2275390625,
+    "Fe_activated_err": 0.006550678294447006,
+    "Fe_inactive": 0.276123046875,
+    "Fe_inactive_err": 0.006985600246616881,
+    "drop_index": 1
+  },
+  "jobs": [
+    {
+      "job_id": "d7t8rn2udops7397m8g0",
+      "circuit_name": "Ransomware_victim_n2",
+      "shots": 4096,
+      "backend": "ibm_fez",
+      "counts": {
+        "10": 972,
+        "01": 1090,
+        "11": 903,
+        "00": 1131
+      }
+    },
+    {
+      "job_id": "d7t8rtfljm6s73bcadsg",
+      "circuit_name": "Exp1_BSM_n2",
+      "shots": 4096,
+      "backend": "ibm_fez",
+      "counts": {
+        "00": 932,
+        "01": 1920,
+        "11": 658,
+        "10": 586
+      }
+    }
+  ]
+}

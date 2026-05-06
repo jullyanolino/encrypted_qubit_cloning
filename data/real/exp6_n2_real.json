@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "6",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "ibm_fez",
+    "backend_type": "real",
+    "timestamp": "2026-05-06T00:39:01.730860Z"
+  },
+  "result": {
+    "n": 2,
+    "Fe_no_key": 0.270751953125,
+    "Fe_no_key_err": 0.006942940803645754,
+    "Fe_with_key": 0.23291015625,
+    "Fe_with_key_err": 0.006604460631705085,
+    "message": "Phase 1: Fe=0.271 (useless). Phase 2: Fe=0.233 (full recovery after key intercept). Mitigation: PQC-KEM on classical key channel."
+  },
+  "jobs": [
+    {
+      "job_id": "d7t8r3sf3ras73b8t79g",
+      "circuit_name": "Ransomware_victim_n2",
+      "shots": 4096,
+      "backend": "ibm_fez",
+      "counts": {
+        "00": 1109,
+        "11": 913,
+        "10": 946,
+        "01": 1128
+      }
+    },
+    {
+      "job_id": "d7t8r6sf3ras73b8t7eg",
+      "circuit_name": "Exp1_BSM_n2",
+      "shots": 4096,
+      "backend": "ibm_fez",
+      "counts": {
+        "11": 559,
+        "00": 954,
+        "10": 481,
+        "01": 2102
+      }
+    }
+  ]
+}

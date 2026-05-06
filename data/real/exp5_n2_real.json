@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "5",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "ibm_marrakesh",
+    "backend_type": "real",
+    "timestamp": "2026-05-06T00:37:09.205931Z"
+  },
+  "result": {
+    "n": 2,
+    "Fe_honest": 0.7080078125,
+    "Fe_honest_err": 0.007104355197909772,
+    "Fe_victim": 0.248291015625,
+    "Fe_victim_err": 0.00675033613140412,
+    "Fe_adversary": 0.678955078125,
+    "Fe_adversary_err": 0.007294968969698638
+  },
+  "jobs": [
+    {
+      "job_id": "d7t8q74f3ras73b8t660",
+      "circuit_name": "Exp1_BSM_n2",
+      "shots": 4096,
+      "backend": "ibm_marrakesh",
+      "counts": {
+        "00": 2900,
+        "10": 374,
+        "11": 440,
+        "01": 382
+      }
+    },
+    {
+      "job_id": "d7t8q94t738s73chhvag",
+      "circuit_name": "Ransomware_victim_n2",
+      "shots": 4096,
+      "backend": "ibm_marrakesh",
+      "counts": {
+        "11": 1058,
+        "00": 1017,
+        "01": 1015,
+        "10": 1006
+      }
+    },
+    {
+      "job_id": "d7t8qasf3ras73b8t6bg",
+      "circuit_name": "Exp1_BSM_n2",
+      "shots": 4096,
+      "backend": "ibm_marrakesh",
+      "counts": {
+        "00": 2781,
+        "11": 427,
+        "01": 457,
+        "10": 431
+      }
+    }
+  ]
+}
