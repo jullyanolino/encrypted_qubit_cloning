@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "1",
+    "n": 8,
+    "shots": 4096,
+    "backend_label": "aer_simulator_statevector",
+    "backend_type": "ideal",
+    "timestamp": "2026-05-05T23:35:28.865430Z"
+  },
+  "result": {
+    "n": 8,
+    "Fe_BSM": 1.0,
+    "Fe_BSM_err": 0.0,
+    "Fe_POM": 1.0,
+    "Fe_POM_err": 0.011047846693980162,
+    "Fe_UQCM": 0.5555555555555556,
+    "witnessed": true,
+    "above_floor": true,
+    "label": ""
+  },
+  "jobs": []
+}

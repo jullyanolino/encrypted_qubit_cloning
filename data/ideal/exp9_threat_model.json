@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "9",
+    "n": 2,
+    "shots": 0,
+    "backend_label": "none",
+    "backend_type": "none",
+    "timestamp": "2026-05-06T00:00:38.302266Z"
+  },
+  "result": {
+    "adversary_classes": [
+      {
+        "id": 1,
+        "name": "Classical adversary",
+        "capability": "Eavesdrop on classical/quantum channels",
+        "quantum_memory": false,
+        "quantum_computer": false,
+        "attack_surface": "Classical key delivery channel",
+        "mitigation": "AES-256 / symmetric cipher on key channel",
+        "residual_risk": "None (information-theoretic security on quantum channel)"
+      },
+      {
+        "id": 2,
+        "name": "Quantum adversary (future QC)",
+        "capability": "Run Shor's algorithm on RSA/ECC keys",
+        "quantum_memory": false,
+        "quantum_computer": true,
+        "attack_surface": "Asymmetric wrapper on key delivery channel",
+        "mitigation": "PQC-KEM (ML-KEM, NIST 2024) on key channel",
+        "residual_risk": "None if PQC-KEM is deployed"
+      },
+      {
+        "id": 3,
+        "name": "Harvest-Now-Decrypt-Later adversary",
+        "capability": "Long-lived quantum memory + classical channel access",
+        "quantum_memory": true,
+        "quantum_computer": false,
+        "attack_surface": "Classical key channel at any time T₂ > T₁",
+        "mitigation": "PQC-KEM + ephemeral forward secrecy on key delivery",
+        "residual_risk": "None if forward secrecy is enforced"
+      },
+      {
+        "id": 4,
+        "name": "Malicious quantum cloud (ransomware)",
+        "capability": "Full control of quantum compute/storage infrastructure",
+        "quantum_memory": true,
+        "quantum_computer": true,
+        "attack_surface": "Alice's raw qubit BEFORE local U_enc",
+        "mitigation": "Perform U_enc locally; never transmit unencrypted qubits",
+        "residual_risk": "None if local-first encryption is enforced"
+      }
+    ],
+    "invariant": "The quantum channel carrying S_i is ALWAYS unconditionally secure. The attack surface is EXCLUSIVELY the classical key delivery channel. Total system security = security of classical key channel.",
+    "actionable_summary": [
+      "Deploy PQC-KEM (ML-KEM) for all key delivery channels NOW.",
+      "Enforce ephemeral forward secrecy (ECDHE + PQC hybrid) on key sessions.",
+      "Never transmit raw qubits to untrusted quantum cloud providers.",
+      "Perform U_enc locally before any external quantum transmission.",
+      "Audit classical channel infrastructure — it is your only attack surface."
+    ]
+  },
+  "jobs": []
+}

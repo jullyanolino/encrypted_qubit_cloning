@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "7",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "aer_simulator_statevector",
+    "backend_type": "ideal",
+    "timestamp": "2026-05-05T23:59:15.232145Z"
+  },
+  "result": {
+    "n": 2,
+    "n_drops": 4,
+    "Fe_activated": 1.0,
+    "Fe_activated_err": 0.0,
+    "Fe_inactive": 0.25390625,
+    "Fe_inactive_err": 0.00680069695365149,
+    "drop_index": 1
+  },
+  "jobs": []
+}

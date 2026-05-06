@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "2",
+    "n": 3,
+    "shots": 4096,
+    "backend_label": "aer_simulator_statevector",
+    "backend_type": "ideal",
+    "timestamp": "2026-05-05T23:36:25.346741Z"
+  },
+  "result": [
+    {
+      "n": 3,
+      "scenario": "2-2",
+      "S": 2.85107421875,
+      "S_err": 0.0625,
+      "S_UQCM": 0.6159685738336148,
+      "violated": true
+    },
+    {
+      "n": 3,
+      "scenario": "2-2",
+      "S": 2.85107421875,
+      "S_err": 0.0625,
+      "S_UQCM": 0.6159685738336148,
+      "violated": true
+    },
+    {
+      "n": 3,
+      "scenario": "2-2",
+      "S": 2.85107421875,
+      "S_err": 0.0625,
+      "S_UQCM": 0.6159685738336148,
+      "violated": true
+    }
+  ],
+  "jobs": []
+}

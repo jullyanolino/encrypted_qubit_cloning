@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "4",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "aer_simulator_statevector",
+    "backend_type": "ideal",
+    "timestamp": "2026-05-05T23:55:57.654598Z"
+  },
+  "result": {
+    "r": 6,
+    "n_clones": 2,
+    "Fr": 1.0,
+    "Fr_err": 0.0,
+    "noise_floor": 0.015625,
+    "witnessed": true,
+    "above_floor": true
+  },
+  "jobs": []
+}
