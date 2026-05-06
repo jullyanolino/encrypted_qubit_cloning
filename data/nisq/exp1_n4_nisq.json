@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "1",
+    "n": 4,
+    "shots": 4096,
+    "backend_label": "aer_simulator",
+    "backend_type": "nisq",
+    "timestamp": "2026-05-06T00:21:32.386282Z"
+  },
+  "result": {
+    "n": 4,
+    "Fe_BSM": 0.253662109375,
+    "Fe_BSM_err": 0.006798538654916146,
+    "Fe_POM": 0.25146484375,
+    "Fe_POM_err": 0.0146268476885957,
+    "Fe_UQCM": 0.6,
+    "witnessed": false,
+    "above_floor": true,
+    "label": ""
+  },
+  "jobs": []
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "5",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "aer_simulator",
+    "backend_type": "nisq",
+    "timestamp": "2026-05-06T00:22:07.630609Z"
+  },
+  "result": {
+    "n": 2,
+    "Fe_honest": 0.734375,
+    "Fe_honest_err": 0.006901022473194614,
+    "Fe_victim": 0.252197265625,
+    "Fe_victim_err": 0.006785529410728079,
+    "Fe_adversary": 0.734375,
+    "Fe_adversary_err": 0.006901022473194614
+  },
+  "jobs": []
+}

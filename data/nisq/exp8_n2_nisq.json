@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "8",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "aer_simulator",
+    "backend_type": "nisq",
+    "timestamp": "2026-05-06T00:23:39.429739Z"
+  },
+  "result": [
+    {
+      "n": 2,
+      "k": 0,
+      "Fe": 0.252197265625,
+      "Fe_err": 0.006785529410728079,
+      "theory_Fe": 0.25
+    },
+    {
+      "n": 2,
+      "k": 1,
+      "Fe": 0.252197265625,
+      "Fe_err": 0.006785529410728079,
+      "theory_Fe": 0.25
+    },
+    {
+      "n": 2,
+      "k": 2,
+      "Fe": 0.734375,
+      "Fe_err": 0.006901022473194614,
+      "theory_Fe": 1.0
+    }
+  ],
+  "jobs": []
+}

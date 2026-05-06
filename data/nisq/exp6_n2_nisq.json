@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.1",
+  "meta": {
+    "experiment": "6",
+    "n": 2,
+    "shots": 4096,
+    "backend_label": "aer_simulator",
+    "backend_type": "nisq",
+    "timestamp": "2026-05-06T00:22:41.081542Z"
+  },
+  "result": {
+    "n": 2,
+    "Fe_no_key": 0.252197265625,
+    "Fe_no_key_err": 0.006785529410728079,
+    "Fe_with_key": 0.734375,
+    "Fe_with_key_err": 0.006901022473194614,
+    "message": "Phase 1: Fe=0.252 (useless). Phase 2: Fe=0.734 (full recovery after key intercept). Mitigation: PQC-KEM on classical key channel."
+  },
+  "jobs": []
+}
