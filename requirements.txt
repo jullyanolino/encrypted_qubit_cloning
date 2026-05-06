@@ -1,0 +1,32 @@
+# ============================================================
+# enc_qubit_cloning.py — Python dependencies
+# DEF CON 34 · Quantum Village
+# ============================================================
+#
+# Tested combination (verified working):
+#   Python        3.11 or 3.12
+#   qiskit        2.4.0
+#   qiskit-aer    0.17.2
+#   qiskit-ibm-runtime  0.35.x
+#   numpy         1.26.x / 2.x
+#   matplotlib    3.9.x
+#
+# Upper bounds prevent silent breakage if Qiskit 3.x
+# introduces API changes. Widen them only after testing.
+# ============================================================
+
+# ── Quantum stack ─────────────────────────────────────────────
+qiskit>=2.4.0,<3.0.0
+qiskit-aer>=0.17.0,<1.0.0
+qiskit-ibm-runtime>=0.35.0,<1.0.0
+
+# ── Numerics and plotting ─────────────────────────────────────
+numpy>=1.26.0,<3.0.0
+matplotlib>=3.8.0,<4.0.0
+
+# ── Optional: .env credential loading ────────────────────────
+# The script loads IBM_QUANTUM_TOKEN from a .env file
+# using a hand-rolled parser (no external dependency).
+# python-dotenv is NOT required but can be used as a drop-in
+# if you prefer it for other projects in the same environment.
+# python-dotenv>=1.0.0
