@@ -833,7 +833,7 @@ encrypted_qubit_cloning/
 
 ## About the Author
 
-**jullyanolino** — Computer Science (UFPI), Quantum Communication post-graduate (SENAI/CIMATEC), Mathematics (Uninter).
+**Jullyano Lino** — Computer Science (UFPI), Quantum Communication post-graduate (SENAI/CIMATEC), Mathematics (Uninter).
 
 Author of papers on quantum sensing (RADAR/LIDAR) for national defence (ITA 2023, IEEE Spectrum Magazine 2025). Quantum cybersecurity speaker at MindTheSec 2023, IBM Qiskit Fall Fest 2024 and 2025, HNWD 2026. Official translator of IBM Qiskit documentation. Quantum challenge participant (IBM, QWorld, Venturus, C.E.S.A.R.).
 
