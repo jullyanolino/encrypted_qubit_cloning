@@ -733,6 +733,24 @@ python enc_qubit_cloning.py.py -e 5 --backend ideal --n 2 --no-verify
 ```
 
 All ideal and NISQ results should match exactly (seeded). Hardware results will vary by backend calibration date.
+---
+
+## Drawing circuits
+
+``` bash
+# Standard (slides) — colour-coded, 150 dpi, goes to figures\
+python enc_qubit_cloning.py --draw-circuits --n 2 --figures-dir figures
+
+# Print / LaTeX — black-and-white, 300 dpi
+python enc_qubit_cloning.py --draw-circuits --n 2 --draw-style bw --draw-dpi 300 --figures-dir figures
+
+# With decomposed primitives — adds *_decomposed.png for each circuit
+# Use for the Methods section or circuit-depth analysis slides
+python enc_qubit_cloning.py --draw-circuits --n 2 --draw-decompose --figures-dir figures
+
+# n=3 version for the slide comparing circuit depth with n=2
+python enc_qubit_cloning.py --draw-circuits --n 3 --figures-dir figures
+```
 
 ---
 
