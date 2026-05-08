@@ -142,7 +142,7 @@ The noise qubits are **consumed** — only one decryption is possible, consisten
 
 ```
 encrypted_qubit_cloning/
-├── enc_qubit_cloning.py.py   ← Main script: all 9 experiments + CLI
+├── enc_qubit_cloning.py   ← Main script: all 9 experiments + CLI
 ├── requirements.txt                ← Pinned dependencies
 ├── .env.example                    ← Template for IBM Quantum credentials
 ├── .gitignore
@@ -199,7 +199,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Verify everything works (no IBM account needed)
-python enc_qubit_cloning.py.py --verify
+python enc_qubit_cloning.py --verify
 ```
 
 Expected output:
@@ -213,7 +213,7 @@ All checks passed.
 **To reproduce the talk's central demonstration in 30 seconds:**
 
 ```bash
-python enc_qubit_cloning.py.py -e 5 --n 2 --backend ideal --no-verify
+python enc_qubit_cloning.py -e 5 --n 2 --backend ideal --no-verify
 ```
 
 ```
@@ -299,7 +299,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-python enc_qubit_cloning.py.py --verify
+python enc_qubit_cloning.py --verify
 ```
 
 ---
@@ -320,14 +320,18 @@ IBM_QUANTUM_TOKEN=your_api_token_here
 IBM_QUANTUM_INSTANCE=ibm-q/open/main
 ```
 
+> **Instance format:** `ibm-q/open/main` is the legacy format, still accepted by most accounts. If your IBM Quantum dashboard shows a Cloud Resource Name (CRN) starting with `crn:v1:bluemix:...`, use that value instead. Both formats are supported by the script.
+
 Obtain your token at [quantum.ibm.com](https://quantum.ibm.com) → Account → API token.
 
 > **Note:** `.env` is in `.gitignore` and is never committed. Each real-hardware job produces a `job_id` in the output JSON, verifiable at `quantum.ibm.com/jobs/<job_id>`.
 
+> **Transient errors (9701):** IBM Quantum occasionally returns error code 9701 ("Temporary Internal Error"). The script handles this automatically with exponential-backoff retry: up to 5 attempts, starting with a 10-second wait and doubling each time. No action is needed — if all 5 attempts fail, the script prints a diagnostic message with the error code and a link to IBM's error documentation.
+
 You can also pass credentials as flags:
 
 ```bash
-python enc_qubit_cloning.py.py --token <tok> --instance ibm-q/open/main ...
+python enc_qubit_cloning.py --token <tok> --instance ibm-q/open/main ...
 ```
 
 ---
@@ -356,15 +360,25 @@ No backend or IBM account required.
 
 ```bash
 # Protocol self-verification (n=2, 3, 4) — run this first on every machine
-python enc_qubit_cloning.py.py --verify
+python enc_qubit_cloning.py --verify
 
 # List available IBM backends (requires .env)
-python enc_qubit_cloning.py.py --list-backends
+python enc_qubit_cloning.py --list-backends
 
 # Export circuits to circuits/ (QPY bundle + QASM2 text)
-python enc_qubit_cloning.py.py --export-circuits --n 2 --no-verify
-python enc_qubit_cloning.py.py --export-circuits --n 3 --no-verify
-python enc_qubit_cloning.py.py --export-circuits --n 4 --no-verify
+python enc_qubit_cloning.py --export-circuits --n 2 --no-verify
+python enc_qubit_cloning.py --export-circuits --n 3 --no-verify
+python enc_qubit_cloning.py --export-circuits --n 4 --no-verify
+
+# Draw circuit diagrams as PNG — no IBM account needed
+# Produces 12 PNG files: U_enc, U_dec, Exp1-4, Exp5-8 security variants
+python enc_qubit_cloning.py --draw-circuits --n 2 --figures-dir figures
+
+# Black-and-white, 300 dpi (for print or LaTeX)
+python enc_qubit_cloning.py --draw-circuits --n 2 --draw-style bw --draw-dpi 300 --figures-dir figures
+
+# With decomposed primitive gates (H, CX, Rz) — for Methods slides
+python enc_qubit_cloning.py --draw-circuits --n 2 --draw-decompose --figures-dir figures
 ```
 
 ---
@@ -376,74 +390,87 @@ Deterministic (seeded). Run once, commit, never re-run. These are the `[SIM]` re
 ```bash
 # ── Core protocol (Experiments 1-4) ──────────────────────────────────────
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 1 --backend ideal --sweep --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp1_sweep_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 2 --backend ideal --n 2 --shots 4096 --no-verify \
   --save-json data/ideal/exp2_n2_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 2 --backend ideal --n 3 --shots 4096 --no-verify \
   --save-json data/ideal/exp2_n3_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 3 --backend ideal --sweep --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp3_sweep_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 4 --backend ideal --sweep --shots 4096 --no-verify \
   --save-json data/ideal/exp4_sweep_ideal.json
 
 # ── Security experiments (Experiments 5-9) ──────────────────────────────
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend ideal --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp5_n2_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend ideal --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp5_n3_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend ideal --n 4 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp5_n4_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 6 --backend ideal --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp6_n2_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 6 --backend ideal --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp6_n3_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 7 --backend ideal --n 2 --n-drops 4 --activate-drop 1 \
   --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp7_n2_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend ideal --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp8_n2_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend ideal --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp8_n3_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend ideal --n 4 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp8_n4_ideal.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 9 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/ideal/exp9_threat_model.json
 
 # ── Full security suite in one pass ─────────────────────────────────────
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e security --backend ideal --n 2 --n-drops 4 --activate-drop 1 \
-  --shots 4096 --plot --no-verify
+  --shots 4096 --plot --no-verify \
+  --figures-dir figures
 ```
 
 ---
@@ -453,37 +480,45 @@ python enc_qubit_cloning.py.py \
 Depolarizing noise model: 1-qubit error 0.1%, 2-qubit error 1.0%. Approximates current IBM Eagle R3 hardware.
 
 ```bash
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 1 --backend nisq --sweep --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp1_sweep_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend nisq --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp5_n2_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend nisq --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp5_n3_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 6 --backend nisq --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp6_n2_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 6 --backend nisq --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp6_n3_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 7 --backend nisq --n 2 --n-drops 4 --activate-drop 1 \
   --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp7_n2_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend nisq --n 2 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp8_n2_nisq.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend nisq --n 3 --shots 4096 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/nisq/exp8_n3_nisq.json
 ```
 
@@ -499,15 +534,16 @@ Requires `.env` with valid credentials. Each command produces a JSON in `data/re
 # ── Experiment 1: Control run — verifies the backend is functional ───────
 # If Fe_BSM < 0.5 for n=2, the backend is too noisy. Request another.
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 1 --backend real --n 2 --shots 8192 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/real/exp1_n2_real.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 1 --backend real --n 3 --shots 8192 --no-verify \
   --save-json data/real/exp1_n3_real.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 1 --backend real --n 4 --shots 8192 --no-verify \
   --save-json data/real/exp1_n4_real.json
 
@@ -515,32 +551,36 @@ python enc_qubit_cloning.py.py \
 # Critical: Fe_victim must be ≈ 0.25 regardless of backend quality.
 # Fe_honest is the control — expected ~0.70–0.82 on Eagle R3.
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend real --n 2 --shots 8192 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/real/exp5_n2_real.json
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --backend real --n 3 --shots 4096 --no-verify \
   --save-json data/real/exp5_n3_real.json
 
 # ── Experiment 6: Harvest Now, Decrypt Later ─────────────────────────────
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 6 --backend real --n 2 --shots 8192 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/real/exp6_n2_real.json
 
 # ── Experiment 7: Quantum Dead Drop ─────────────────────────────────────
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 7 --backend real --n 2 --n-drops 4 --activate-drop 1 \
   --shots 8192 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/real/exp7_n2_real.json
 
 # ── Experiment 8: Partial Key Attack ────────────────────────────────────
 # n=2: k ∈ {0, 1, 2}. Three circuits. Fits in Open Plan budget.
 
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --backend real --n 2 --shots 8192 --plot --no-verify \
+  --figures-dir figures \
   --save-json data/real/exp8_n2_real.json
 ```
 
@@ -552,34 +592,38 @@ Run after `data/real/` JSON files are collected. Produces the `compare_*.png` fi
 
 ```bash
 # Exp 5: ideal vs NISQ vs real — the "money plot"
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json \
     data/ideal/exp5_n2_ideal.json \
     data/nisq/exp5_n2_nisq.json \
     data/real/exp5_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 
 # Exp 6: ideal vs real
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json \
     data/ideal/exp6_n2_ideal.json \
     data/real/exp6_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 
 # Exp 8: ideal vs NISQ vs real
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json \
     data/ideal/exp8_n2_ideal.json \
     data/nisq/exp8_n2_nisq.json \
     data/real/exp8_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 
 # Exp 1: Fe vs n comparison across backends
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json \
     data/ideal/exp1_sweep_ideal.json \
     data/real/exp1_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 ```
 
 ---
@@ -590,27 +634,29 @@ These are the exact commands used on stage at CryptoRave 2026. No IBM connection
 
 ```bash
 # 1. Protocol self-check (~30 s)
-python enc_qubit_cloning.py.py --verify
+python enc_qubit_cloning.py --verify
 
 # 2. Ransomware attack — the central demonstration (~20 s)
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 5 --n 2 --backend ideal --no-verify
 
 # 3. All-or-nothing key threshold (~20 s)
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   -e 8 --n 4 --backend ideal --no-verify
 
 # 4. Pre-collected hardware result — no IBM needed (~5 s)
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json data/real/exp5_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 
 # 5. Comparison: ideal vs hardware side-by-side (~5 s)
-python enc_qubit_cloning.py.py \
+python enc_qubit_cloning.py \
   --load-json \
     data/ideal/exp5_n2_ideal.json \
     data/real/exp5_n2_real.json \
-  --plot --no-verify
+  --plot --no-verify \
+  --figures-dir figures
 ```
 
 ---
@@ -728,8 +774,8 @@ git clone https://github.com/jullyanolino/encrypted_qubit_cloning.git
 cd encrypted_qubit_cloning
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python enc_qubit_cloning.py.py --verify
-python enc_qubit_cloning.py.py -e 5 --backend ideal --n 2 --no-verify
+python enc_qubit_cloning.py --verify
+python enc_qubit_cloning.py -e 5 --backend ideal --n 2 --no-verify
 ```
 
 All ideal and NISQ results should match exactly (seeded). Hardware results will vary by backend calibration date.
@@ -758,7 +804,7 @@ python enc_qubit_cloning.py --draw-circuits --n 3 --figures-dir figures
 
 ```
 encrypted_qubit_cloning/
-├── enc_qubit_cloning.py.py   Main CLI (2603 lines, 9 experiments)
+├── enc_qubit_cloning.py   Main CLI (~3060 lines, 9 experiments)
 ├── requirements.txt                Pinned Python dependencies
 ├── .env.example                    Credential template (never commit .env)
 ├── .gitignore
