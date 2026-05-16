@@ -28,6 +28,7 @@
 <div align="center">
 
 [![Talk](https://img.shields.io/badge/CryptoRave%202026-Talk%20DYKJPZ-02470d?style=for-the-badge&logo=slides&logoColor=white)](https://cpa.cryptorave.org/cryptorave-2026/talk/DYKJPZ/)
+[![Talk](https://img.shields.io/badge/BSidesSP%202026-Quantum%20Village-0A2540?style=for-the-badge&logo=slides&logoColor=white)](https://securitybsides.com.br/2026/quantum-village-br/)
 [![arXiv theory](https://img.shields.io/badge/arXiv-2501.02757-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2501.02757)
 [![arXiv hardware](https://img.shields.io/badge/arXiv-2602.10695-b31b1b?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2602.10695)
 [![IBM Quantum](https://img.shields.io/badge/IBM%20Quantum-Verified-1e49be?style=for-the-badge&logo=ibm&logoColor=white)](https://quantum.ibm.com)
