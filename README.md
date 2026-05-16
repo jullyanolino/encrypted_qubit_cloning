@@ -37,6 +37,7 @@
 **"You can't clone a qubit — unless you encrypt it first."**
 
 *Presented at [CryptoRave 2026](https://cpa.cryptorave.org/cryptorave-2026/talk/DYKJPZ/) · May 9, 2026*
+*Presented at [BSidesSP 2026](https://securitybsides.com.br/2026/quantum-village-br/) · May 17, 2026*
 
 </div>
 
