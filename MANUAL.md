@@ -772,20 +772,3 @@ python enc_qubit_cloning.py \
     data/real/exp8_n2_real.json \
   --plot --no-verify --figures-dir figures
 ```
-
----
-
-## README Alignment
-
-The `README.md` already reflects the current state of the script after previous rounds of fixes. No changes are needed. The README correctly documents:
-
-- Script filename: `enc_qubit_cloning.py` (not `.py.py`)
-- `--figures-dir figures` present on all `--plot` commands
-- `--draw-circuits` group documented in Group 0
-- IBM error 9701 retry behaviour noted under IBM Quantum Credentials
-- Instance CRN format documented
-- Open Plan budget note for Group 3
-
----
-
-*Last updated to reflect enc_qubit_cloning.py at 3159 lines (7 bugs fixed).*
