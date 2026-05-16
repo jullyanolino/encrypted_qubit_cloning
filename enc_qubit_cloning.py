@@ -8,6 +8,19 @@ CLI implementation of all four hardware experiments from:
   "Experimental demonstration that qubits can be cloned at will,
    if encrypted with a single-use decryption key"
 
+Extended with security analysis (Experiments 5–9) and updated to account
+for two new theoretical results:
+
+  Ceară (2026)  arXiv:2604.04888
+  "Cloning Encrypted Quantum States in Arbitrary Dimensions"
+  — Extends the protocol to qudits; current code is the qubit (d=2) case.
+    The Holevo bound and all-or-nothing threshold hold for all d.
+
+  Gianini et al. (2026)  arXiv:2604.10155
+  "Encrypted clones can leak: Classification of informative subsets"
+  — Shows that certain mixed subsets of the storage register (clone + noise
+    qubits from different pairs) can leak the y-Bloch component of |ψ⟩.
+    Individual clones S_i (n > 1) remain I/2. See Exp 8 docstring.
 ────────────────────────────────────────────────────────────────────────────
 IBM QUANTUM CREDENTIALS
 ────────────────────────────────────────────────────────────────────────────
@@ -37,6 +50,8 @@ import time
 import random
 import warnings
 import json
+import datetime
+import dataclasses
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -393,8 +408,11 @@ def build_exp3_iterated(l: int, n_base: int = 2) -> QuantumCircuit:
         _bell(qc, si, ni)
     qc.append(_enc_gate(n_base), [1] + s0)
     qc.barrier()
+
+    gen_noise_lists: list[list[int]] = [n0]
     prev_clone = s0[0]
     offset = 2 + 2 * n_base
+
     for gen in range(1, l + 1):
         sg = [offset + i for i in range(n_base)]
         ng = [offset + n_base + i for i in range(n_base)]
@@ -402,16 +420,19 @@ def build_exp3_iterated(l: int, n_base: int = 2) -> QuantumCircuit:
             _bell(qc, si, ni)
         qc.append(_enc_gate(n_base), [prev_clone] + sg)
         qc.barrier()
+        gen_noise_lists.append(ng)
         prev_clone = sg[0]
         offset += 2 * n_base
-    final_noise_start = offset - n_base
-    dec_qubits = [prev_clone] + list(range(final_noise_start, final_noise_start + n_base))
-    qc.append(_dec_gate(n_base), dec_qubits)
-    qc.barrier()
-    qc.cx(0, prev_clone)
+
+    final_clone = prev_clone
+    for noise_qs in reversed(gen_noise_lists):
+        qc.append(_dec_gate(n_base), [final_clone] + noise_qs)
+        qc.barrier()
+
+    qc.cx(0, final_clone)
     qc.h(0)
     qc.measure(0, 0)
-    qc.measure(prev_clone, 1)
+    qc.measure(final_clone, 1)
     return qc
 
 
@@ -477,7 +498,7 @@ def correlator_from_counts(counts: dict, shots: int) -> float:
     return (N00 + N11 - N01 - N10) / shots
 
 
-def chsh_from_four_correlators(E_A0B0, E_A0B1, E_A1B0, E_A1B1) -> tuple[float, float]:
+def chsh_from_four_correlators(E_A0B0, E_A0B1, E_A1B0, E_A1B1) -> float:
     return E_A0B0 + E_A0B1 + E_A1B0 - E_A1B1
 
 
@@ -857,7 +878,7 @@ def run_experiment_2(n: int, backend, shots: int,
     results = []
     for scen in (21, 22, 23):
         if verbose:
-            print(f"\n{C.BOLD}[Exp 2]{C.RESET}  n={n}  scenario 2-{scen//10}"
+            print(f"\n{C.BOLD}[Exp 2]{C.RESET}  n={n}  scenario 2-{scen % 10}"
                   f"  shots={shots}")
 
         E = {}
@@ -878,7 +899,7 @@ def run_experiment_2(n: int, backend, shots: int,
                   f"[UQCM: {S_uqcm:.4f}]   "
                   f"{sym} {'CHSH violated' if violated else 'no violation'}")
 
-        results.append(CHSHResult(n=n, scenario=f"2-{scen//10}",
+        results.append(CHSHResult(n=n, scenario=f"2-{scen % 10}",
                                    S=S, S_err=err,
                                    S_UQCM=S_uqcm, violated=violated))
     return results
@@ -942,10 +963,7 @@ def run_experiment_4(r: int, backend, shots: int,
               f"{C.YELLOW}·{C.RESET}" if above_floor else f"{C.RED}✗{C.RESET}")
         print(f"  Fr = {Fr:.4f} ± {err:.4f}   "
               f"noise_floor={noise_floor:.5f}   {sym}")
-    """
-    return dict(r=r, Fr=Fr, Fr_err=err,
-                noise_floor=noise_floor, witnessed=witnessed)
-    """
+
     result = GHZResult(
         r=r,
         n_clones=n_clones,
@@ -977,7 +995,8 @@ def plot_exp1_sweep(results: list[FidelityResult], outfile: str = "exp1_result.p
     ax.axhline(0.25, linestyle=":",  color="#999", linewidth=1.0,
                label="Noise floor (Fe=0.25)")
 
-    ax.fill_between(ns, 0.5, max(fe + [0.85]), alpha=0.06, color="#4CAF50")
+    if len(ns) > 1:
+        ax.fill_between(ns, 0.5, max(fe + [0.85]), alpha=0.06, color="#4CAF50")
     ax.set_xlabel("Clone count  n", fontsize=13)
     ax.set_ylabel("Entanglement fidelity  Fₑ", fontsize=13)
     ax.set_title("Experiment 1 — Encrypted Cloning: Fe vs n\n"
@@ -987,6 +1006,7 @@ def plot_exp1_sweep(results: list[FidelityResult], outfile: str = "exp1_result.p
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1016,6 +1036,7 @@ def plot_exp3_iterated(results: list[IteratedResult],
                  fontsize=11)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1255,6 +1276,7 @@ def plot_exp5_ransomware(result: RansomwareResult,
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1371,6 +1393,7 @@ def plot_exp6_harvest(result: HarvestResult, outfile: str = "exp6_harvest.png") 
                  fontsize=10, fontweight="bold")
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1417,6 +1440,7 @@ def bloch_sphere_plot(states_by_panel: list[tuple[str, list[tuple[str, np.ndarra
                  fontsize=9, fontweight="bold", y=0.02)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1533,6 +1557,7 @@ def plot_exp7_dead_drop(result: DeadDropResult,
                  fontsize=10, fontweight="bold")
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1555,6 +1580,16 @@ def run_experiment_8(n: int, backend, shots: int,
         (The theoretical result: missing even 1 noise qubit means the
          remaining state is 1/4 Σ_μ |φ_μ><φ_μ|^⊗(n-1), independent of |ψ>.)
 
+    Security nuance (Gianini et al. arXiv:2604.10155, April 2026):
+      The above all-or-nothing result holds for the ALIGNED case tested here:
+      the adversary holds all n signal qubits and k < n noise qubits.
+      Gianini et al. show that certain MIXED subsets of the storage register
+      (qubits drawn from both S and N across different pairs) can retain
+      partial information about the y-Bloch component of |ψ⟩. This is a
+      parity-dependent structural limitation. Individual clones S_i (in
+      isolation, n > 1) remain I/2 and completely uninformative. Subsets
+      missing a complete pair {S_j, N_j} are also completely uninformative.
+      The present experiment does not test these mixed-subset scenarios.
     """
     if verbose:
         print(f"\n{C.BOLD}[Exp 8 — Partial Key Attack]{C.RESET}  n={n}  shots={shots}")
@@ -1645,6 +1680,7 @@ def plot_exp8_partial_key(results: list[PartialKeyResult],
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1763,6 +1799,8 @@ def run_experiment_9(n: int = 2, verbose: bool = True) -> dict:
     return threat_model
 
 
+import matplotlib.patches as _mpatches
+
 def plot_exp9_threat_model(threat_model: dict,
                            outfile: str = "exp9_threat_model.png") -> None:
     """
@@ -1774,7 +1812,6 @@ def plot_exp9_threat_model(threat_model: dict,
     ax.set_ylim(0, 7)
     ax.set_axis_off()
 
-    # Title
     ax.text(7, 6.6, "Experiment 9 — Classical Channel Security Reduction",
             ha="center", va="center", fontsize=13, fontweight="bold")
     ax.text(7, 6.2,
@@ -1782,8 +1819,7 @@ def plot_exp9_threat_model(threat_model: dict,
             ha="center", va="center", fontsize=10, color="#444",
             style="italic")
 
-    # Quantum channel box (always secure)
-    qbox = plt.matplotlib.patches.FancyBboxPatch(
+    qbox = _mpatches.FancyBboxPatch(
         (0.2, 2.5), 2.8, 3.0, boxstyle="round,pad=0.1",
         linewidth=1.5, edgecolor="#2196F3", facecolor="#E3F2FD", alpha=0.9)
     ax.add_patch(qbox)
@@ -1795,13 +1831,11 @@ def plot_exp9_threat_model(threat_model: dict,
     ax.text(1.6, 3.2,  "No attack surface.", ha="center", fontsize=8, color="#444")
     ax.text(1.6, 2.85, "Ever.", ha="center", fontsize=8, color="#444")
 
-    # Arrow to classical
     ax.annotate("", xy=(3.9, 4.0), xytext=(3.1, 4.0),
                 arrowprops=dict(arrowstyle="->", color="#333", lw=1.5))
     ax.text(3.5, 4.2, "KEY N_i", ha="center", fontsize=8, color="#333")
 
-    # Classical channel box
-    cbox = plt.matplotlib.patches.FancyBboxPatch(
+    cbox = _mpatches.FancyBboxPatch(
         (3.9, 2.5), 3.0, 3.0, boxstyle="round,pad=0.1",
         linewidth=2, edgecolor="#FF5722", facecolor="#FBE9E7", alpha=0.9)
     ax.add_patch(cbox)
@@ -1810,7 +1844,6 @@ def plot_exp9_threat_model(threat_model: dict,
     ax.text(5.4, 4.35, "← SOLE attack surface", ha="center", fontsize=8.5,
             color="#F44336", fontweight="bold")
 
-    # Adversary rows
     colors = ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"]
     ys = [3.8, 3.35, 2.85, 2.4]
     ac_data = threat_model["adversary_classes"]
@@ -1818,12 +1851,10 @@ def plot_exp9_threat_model(threat_model: dict,
         ax.text(5.4, y, f"Adv {ac['id']}: {ac['mitigation'][:45]}", ha="center",
                 fontsize=7.5, color=color)
 
-    # Arrow to outcome
     ax.annotate("", xy=(9.7, 4.0), xytext=(6.9, 4.0),
                 arrowprops=dict(arrowstyle="->", color="#333", lw=1.5))
     ax.text(8.3, 4.2, "mitigate →", ha="center", fontsize=8, color="#333")
 
-    # Outcome boxes
     outcome_data = [
         (4.7, "Adv 1: AES-256 key wrap",       "#4CAF50", "Full security\n(classical model)"),
         (3.85,"Adv 2: PQC-KEM (ML-KEM)",        "#FF9800", "Full PQC security\n(quantum model)"),
@@ -1831,7 +1862,7 @@ def plot_exp9_threat_model(threat_model: dict,
         (2.15,"Adv 4: Local U_enc enforcement", "#9C27B0", "Closes ransomware\nvector"),
     ]
     for y_mid, label, color, outcome in outcome_data:
-        rbox = plt.matplotlib.patches.FancyBboxPatch(
+        rbox = _mpatches.FancyBboxPatch(
             (9.7, y_mid - 0.35), 4.0, 0.7, boxstyle="round,pad=0.08",
             linewidth=1, edgecolor=color, facecolor="white", alpha=0.9)
         ax.add_patch(rbox)
@@ -1840,6 +1871,7 @@ def plot_exp9_threat_model(threat_model: dict,
 
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -1868,10 +1900,6 @@ def plot_exp9_threat_model(threat_model: dict,
 #       0.25 is constant across ideal / nisq / real hardware, proving it is a
 #       physics property of the protocol, not a hardware artefact.
 # ══════════════════════════════════════════════════════════════════════════════
-
-import datetime
-import dataclasses
-
 
 # ── JSON SCHEMA VERSION ───────────────────────────────────────────────────────
 #
@@ -1914,19 +1942,6 @@ def save_run_json(
     result        : experiment dataclass instance, or list[PartialKeyResult]
     outfile       : destination path (created/overwritten)
     """
-    """
-    # Convert dataclass(es) to plain dict for JSON serialisation.
-    # dataclasses.asdict() handles nested dataclasses and lists recursively.
-    if isinstance(result, list):
-        result_dict = [dataclasses.asdict(r) for r in result]
-    else:
-        result_dict = dataclasses.asdict(result)
-    """
-    # Convert result to a plain dict for JSON serialisation.
-    # dataclasses.asdict() is used when the result is a proper dataclass
-    # instance or a list of dataclass instances.  For experiments that
-    # return a plain dict (e.g. Exp 4 before GHZResult was added) or None,
-    # we fall back gracefully rather than crashing.
     if isinstance(result, list):
         result_dict = [
             dataclasses.asdict(r) if dataclasses.is_dataclass(r) else dict(r)
@@ -2496,8 +2511,6 @@ def _plot_compare_ransomware(payloads: list[dict], outfile: str) -> None:
     ax.legend(fontsize=9, loc="upper right")
     ax.grid(axis="y", alpha=0.3)
 
-    # Annotation: draw bracket under Scenario B emphasising constancy
-    y_ann = -0.10
     for bi in range(n_backends):
         x = 1 + (bi - n_backends / 2 + 0.5) * bar_w
         ax.annotate("≈ 0.25", (x, 0.03), ha="center", fontsize=7.5,
@@ -2505,6 +2518,7 @@ def _plot_compare_ransomware(payloads: list[dict], outfile: str) -> None:
 
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -2545,6 +2559,7 @@ def _plot_compare_harvest(payloads: list[dict], outfile: str) -> None:
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -2589,6 +2604,7 @@ def _plot_compare_partial_key(payloads: list[dict], outfile: str) -> None:
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -2624,6 +2640,7 @@ def _plot_compare_fidelity(payloads: list[dict], outfile: str) -> None:
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -2675,6 +2692,7 @@ def _plot_compare_generic(payloads: list[dict], experiment: str,
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(outfile, dpi=150)
+    plt.close(fig)
     print(f"  Saved: {outfile}")
 
 
@@ -3037,13 +3055,21 @@ def main() -> int:
     # ── Experiments 1–4 (original Yamaguchi et al.) ──────────────────────
 
     if args.experiment in ("1", "all"):
-        n_range = list(range(2, 9)) if args.sweep else [args.n]
+        if args.sweep and is_real:
+            n_range = [2, 3, 4]
+            print(f"  {C.YELLOW}[warn]{C.RESET} --sweep on real hardware: restricting to "
+                  f"n=2,3,4 to stay within Open Plan budget. "
+                  f"Use --n for a specific value.")
+        elif args.sweep:
+            n_range = list(range(2, 9))
+        else:
+            n_range = [args.n]
         exp1_results = []
         for n in n_range:
             r = run_experiment_1(n, backend, shots, is_real)
             exp1_results.append(r)
             _last_result, _last_n, _last_exp = r, n, "1"
-        if args.plot and len(n_range) > 1:
+        if args.plot:
             plot_exp1_sweep(exp1_results, outfile=fp("exp1_result.png"))
 
     if args.experiment in ("2", "all"):
@@ -3059,7 +3085,7 @@ def main() -> int:
             r = run_experiment_3(l, backend, shots, is_real)
             exp3_results.append(r)
             _last_result, _last_n, _last_exp = r, args.n, "3"
-        if args.plot and len(l_range) > 1:
+        if args.plot:
             plot_exp3_iterated(exp3_results, outfile=fp("exp3_iterated.png"))
 
     if args.experiment in ("4", "all"):
