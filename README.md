@@ -907,6 +907,10 @@ Author of papers on quantum sensing (RADAR/LIDAR) for national defence (ITA 2023
 **Talk:** [You Can't Clone a Qubit — Unless You Encrypt it First!](https://cpa.cryptorave.org/cryptorave-2026/talk/DYKJPZ/)
 CryptoRave 2026 · May 9, 2026 · Tula Pilar room
 
+**Talk:** [You Can't Clone a Qubit — Unless You Encrypt it First!](https://securitybsides.com.br/2026/quantum-village-br/)
+BSides SP 2026 · May 17, 2026 · Quantum Village · i02C room
+
+
 ---
 
 <div align="center">
