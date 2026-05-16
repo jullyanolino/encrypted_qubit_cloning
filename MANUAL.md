@@ -8,22 +8,21 @@
 
 ## Table of Contents
 
-- [[#Prerequisites]]
-- [[#Quick Start]]
-- [[#CLI Reference]]
-- [[#Experiments]]
-  - [[#Experiments 1–4 — Physics (Yamaguchi et al.)]]
-  - [[#Experiments 5–9 — Security Extensions]]
-- [[#Backends]]
-- [[#Output Files]]
-- [[#Plotting]]
-  - [[#Individual Figures]]
-  - [[#Backend Comparison Figures]]
-- [[#Circuit Diagrams]]
-- [[#Persistence — save and load]]
-- [[#Live Demo Commands]]
-- [[#Suggested Calls per Scenario]]
-- [[#README Alignment]]
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [CLI Reference](#cli-reference)
+- [Experiments](#experiments)
+  - [1–4 — Physics (Yamaguchi et al.)](#experiments-1-4--physics-yamaguchi-et-al)
+  - [5–9 — Security Extensions](#experiments-5-9--security-extensions)
+- [Backends](#backends)
+- [Output Files](#output-files)
+- [Plotting](#plotting)
+  - [Individual Figures](#individual-figures)
+  - [Backend Comparison Figures](#backend-comparison-figures)
+- [Circuit Diagrams](#circuit-diagrams)
+- [Persistence — save and load](#persistence--save-and-load)
+- [Live Demo Commands](#live-demo-commands)
+- [Suggested Calls per Scenario](#suggested-calls-per-scenario)
 
 ---
 
